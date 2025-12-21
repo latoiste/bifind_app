@@ -1,6 +1,7 @@
 import "package:bifind_app/pages/home.dart";
 import "package:bifind_app/pages/notifications.dart";
 import "package:bifind_app/pages/settings.dart";
+import "package:bifind_app/components/navbar.dart";
 import "package:flutter/material.dart";
 
 class MainPage extends StatefulWidget {
@@ -13,7 +14,7 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   int _currentIndex = 0;
 
-  final List<StatelessWidget> _pages = [
+  final List<Widget> _pages = [
     const HomePage(),
     const NotificationPage(),
     const SettingsPage(),
@@ -33,24 +34,15 @@ class _MainPageState extends State<MainPage> {
         title: const Text("AAAAAAAAAA"),
       ),
       body: _pages[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem> [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home), 
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
-            label: 'Notifications',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
-        selectedItemColor: Colors.blue,
-        currentIndex: _currentIndex,
-        onTap: _onTap,
+      bottomNavigationBar: Navbar(
+        selectedIndex: _currentIndex,
+        onSelected: _onTap,
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        label: const Text("Add device"),
+        onPressed: () {
+          print("AAAAAAAA");
+        },
       ),
     );
   }
