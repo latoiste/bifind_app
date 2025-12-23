@@ -25,7 +25,6 @@ class _HomePageState extends State<HomePage> {
             children: [
               SizedBox(width: screenWidth * 0.25, child: TableHeaderCell(title: "Device")),
               SizedBox(width: screenWidth * 0.25, child: TableHeaderCell(title: "Distance")),
-              SizedBox(width: screenWidth * 0.25, child: TableHeaderCell(title: "Battery")),
               SizedBox(width: screenWidth * 0.25, child: TableHeaderCell(title: "Status")),
             ],
           );

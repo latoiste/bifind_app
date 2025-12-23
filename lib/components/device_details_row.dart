@@ -18,7 +18,6 @@ class DeviceDetailsRow extends StatelessWidget {
         // placeholder
         SizedBox(width: screenWidth * 0.25, child: Center(child: Text("AAAAA"))),
         SizedBox(width: screenWidth * 0.25, child: Center(child: Text("BBBB"))),
-        SizedBox(width: screenWidth * 0.25, child: Center(child: Text("CCCCCCCC"))),
         SizedBox(width: screenWidth * 0.25, child: Center(child: Text("DDDD"))),
       ],
     );
