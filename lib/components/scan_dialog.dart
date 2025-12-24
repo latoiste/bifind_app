@@ -1,7 +1,9 @@
+import 'dart:async';
+
 import 'package:bifind_app/components/scanned_device_row.dart';
+import 'package:bifind_app/models/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import 'package:bifind_app/models/discovered_device.dart';
 
 class ScanDialog extends StatefulWidget {
   const ScanDialog({super.key});
@@ -11,40 +13,51 @@ class ScanDialog extends StatefulWidget {
 }
 
 class _ScanDialogState extends State<ScanDialog> {
-  final ScrollController scrollController = ScrollController();
-  final List<DiscoveredDevice> fakeResult = [
-    DiscoveredDevice(
+  final ScrollController _scrollController = ScrollController();
+  final List<DeviceInfo> fakeResult = [
+    DeviceInfo(
       id: DeviceIdentifier("00:11:22:33:44:55"),
       name: "Smart Heart Rate Monitor",
+      rssi: 5,
+      status: DeviceStatus.disconnected,
     ),
-    DiscoveredDevice(
+    DeviceInfo(
       id: DeviceIdentifier("AA:BB:CC:DD:EE:FF"),
       name: "Sony WH-1000XM4",
+      rssi: 5,
+      status: DeviceStatus.connected,
     ),
-    DiscoveredDevice(
+    DeviceInfo(
       id: DeviceIdentifier("12:34:56:78:90:AB"),
       name: "Bi-Find 1",
+      rssi: 5,
+      status: DeviceStatus.connected,
     ),
-    DiscoveredDevice(
+    DeviceInfo(
       id: DeviceIdentifier("FE:ED:BE:EF:01:02"),
       name: "ESP32_Sensor_Node",
+      rssi: 5,
+      status: DeviceStatus.connected,
     ),
-    DiscoveredDevice(
+    DeviceInfo(
       id: DeviceIdentifier("66:55:44:33:22:11"),
       name: "Kitchen Thermometer",
+      rssi: 5,
+      status: DeviceStatus.connected,
     ),
   ];
-  final List<DiscoveredDevice> _scanResults = [];
-  int deviceCount = 1;
-  final List<ExpansibleController> expansibleController = List.generate(
+  final List<DeviceInfo> _scanResults = [];
+  int _deviceCount = 1;
+  final List<ExpansibleController> _expansibleController = List.generate(
     5,
     (index) => ExpansibleController(),
   ); // TODO: change to empty list later
+  StreamSubscription? _subscription;
 
   void startBleScan() async {
     final Guid serviceUuid = Guid("d9380fdc-3c8f-4c49-874d-031ef136716c");
 
-    var subscription = FlutterBluePlus.scanResults.listen((results) {
+    _subscription = FlutterBluePlus.scanResults.listen((results) {
       setState(() {
         final Iterable<DeviceIdentifier> discoveredId = _scanResults.map(
           (device) => device.id,
@@ -56,13 +69,18 @@ class _ScanDialogState extends State<ScanDialog> {
           if (discoveredId.contains(id)) continue;
 
           if (name == "") {
-            name = "Bi-Find Device $deviceCount";
-            deviceCount++;
+            name = "Bi-Find Device $_deviceCount";
+            _deviceCount++;
           }
 
-          DiscoveredDevice newDevice = DiscoveredDevice(id: id, name: name);
+          DeviceInfo newDevice = DeviceInfo(
+            id: id,
+            name: name,
+            rssi: null,
+            status: null,
+          );
           _scanResults.add(newDevice);
-          expansibleController.add(ExpansibleController());
+          _expansibleController.add(ExpansibleController());
         }
       });
     });
@@ -73,7 +91,7 @@ class _ScanDialogState extends State<ScanDialog> {
     );
 
     FlutterBluePlus.stopScan();
-    subscription.cancel();
+    _subscription?.cancel();
     print("scanning finished??");
   }
 
@@ -83,12 +101,14 @@ class _ScanDialogState extends State<ScanDialog> {
     if (!mounted) return;
     setState(() {
       fakeResult.add(
-        DiscoveredDevice(
+        DeviceInfo(
           id: DeviceIdentifier("66:77:67:67:67:67"),
           name: "six",
+          rssi: null,
+          status: null,
         ),
       );
-      expansibleController.add(ExpansibleController());
+      _expansibleController.add(ExpansibleController());
     });
   }
 
@@ -104,14 +124,16 @@ class _ScanDialogState extends State<ScanDialog> {
       FlutterBluePlus.stopScan();
     }
 
-    for (ExpansibleController controller in expansibleController) {
+    for (ExpansibleController controller in _expansibleController) {
       controller.dispose();
     }
     _scanResults.clear();
-    scrollController.dispose();
+    _scrollController.dispose();
+    _subscription?.cancel();
     super.dispose();
   }
 
+  // TODO: ganti semua fakeResult ke _scanResult
   @override
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
@@ -129,17 +151,17 @@ class _ScanDialogState extends State<ScanDialog> {
               padding: EdgeInsets.only(bottom: 15.0),
               height: screenHeight * 0.3,
               child: Scrollbar(
-                controller: scrollController,
+                controller: _scrollController,
                 thumbVisibility: true,
                 // TODO: add condition if no devices being scanned
                 child: ListView.builder(
                   itemCount: fakeResult.length,
-                  controller: scrollController,
+                  controller: _scrollController,
                   itemBuilder: (context, index) {
                     return ScannedDeviceRow(
-                      title: fakeResult[index].name,
+                      device: fakeResult[index],
                       index: index,
-                      controllerList: expansibleController,
+                      controllerList: _expansibleController,
                     );
                   },
                 ),
@@ -149,9 +171,7 @@ class _ScanDialogState extends State<ScanDialog> {
               style: TextButton.styleFrom(
                 foregroundColor: Colors.blue.shade600,
               ),
-              onPressed: () {
-                Navigator.pop(context);
-              },
+              onPressed: () => Navigator.pop(context),
               child: Text("Close"),
             ),
           ],

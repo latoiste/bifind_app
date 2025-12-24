@@ -1,8 +1,12 @@
+import 'package:bifind_app/services/device_listener.dart';
 import 'package:flutter/material.dart';
 import "package:bifind_app/pages/main_page.dart";
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider(
+    create: (context) => DeviceListener(),
+    child: const MyApp(),));
 }
 
 class MyApp extends StatelessWidget {
