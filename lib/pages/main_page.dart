@@ -1,8 +1,9 @@
-import "package:bifind_app/pages/home.dart";
-import "package:bifind_app/pages/notifications.dart";
-import "package:bifind_app/pages/settings.dart";
-import "package:bifind_app/components/navbar.dart";
-import "package:flutter/material.dart";
+import 'package:flutter/material.dart';
+import 'package:bifind_app/pages/home.dart';
+import 'package:bifind_app/pages/notifications.dart';
+import 'package:bifind_app/pages/settings.dart';
+import 'package:bifind_app/components/navbar.dart';
+import 'package:bifind_app/components/scan_dialog.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -41,7 +42,12 @@ class _MainPageState extends State<MainPage> {
       floatingActionButton: FloatingActionButton.extended(
         label: const Text("Add device"),
         onPressed: () {
-          print("AAAAAAAA");
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return ScanDialog();
+            },
+          );
         },
       ),
     );
