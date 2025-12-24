@@ -240,6 +240,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.9.1"
+  pedometer_plus:
+    dependency: "direct main"
+    description:
+      name: pedometer_plus
+      sha256: "0e1cd199bb6bf18479e67d8ae4410306eed45aeaa19721e4c6c2ce1ad0e5530a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
   petitparser:
     dependency: transitive
     description:
