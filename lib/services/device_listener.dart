@@ -12,6 +12,7 @@ class DeviceListener extends ChangeNotifier {
 
   StreamSubscription<StepStatus>? _pedometerSub;
   StreamSubscription<List<ScanResult>>? _bleSub;
+  Timer? _scanTimer;
 
   DeviceListener() {
     _startMovementListener();
@@ -33,7 +34,7 @@ class DeviceListener extends ChangeNotifier {
 
     _pedometerSub = Pedometer().stepStatusStream().listen(
       (status) =>
-          status == StepStatus.walking ? _startScanning() : FlutterBluePlus.stopScan(),
+          status == StepStatus.walking ? _startScanning() : _stopScanning(),
     );
   }
 
@@ -42,18 +43,38 @@ class DeviceListener extends ChangeNotifier {
     _bleSub = FlutterBluePlus.scanResults.listen((results) {
       for (ScanResult r in results) {
         // ga ush filter id, udh di filter dalam startScan
-        seenIdLastScan.add(r.device.remoteId.toString());
-        // change device info nanti kalo perlu
-        // notify kalo distance > 10, write command ke device
+        String id = r.device.remoteId.toString();
+        int index = registeredId.indexOf(id);
+        DeviceInfo device = registeredDevice[index];
+        
+        seenIdLastScan.add(id); //tandain device ga disconnect
+
+        device.addRssi(r.rssi);
+
+        // TODO: notify kalo distance > 10, write command ke device
       }
     });
   }
 
   void _startScanning() async {
+    _performScan();
+
+    _scanTimer = Timer.periodic(
+      Duration(seconds: 20),
+      (_scanTimer) => _performScan(),
+    );
+  }
+
+  void _stopScanning() {
+    if (FlutterBluePlus.isScanningNow) FlutterBluePlus.stopScan();
+
+    _scanTimer?.cancel();
+  }
+
+  void _performScan() async {
     final Guid serviceUuid = Guid("d9380fdc-3c8f-4c49-874d-031ef136716c");
     seenIdLastScan.clear();
 
-    // mulai scan selama 5 detik, setiap result yang diterima, callback ble listener bakal jalan
     await FlutterBluePlus.startScan(
       withServices: [serviceUuid],
       withRemoteIds: registeredId,
@@ -63,11 +84,10 @@ class DeviceListener extends ChangeNotifier {
     for (String id in registeredId) {
       // kalo id ga ke scan dalam 5 detik itu, anggap missing
       if (!seenIdLastScan.contains(id)) {
-        // TODO: Handle disconnected device (change status color)
+        // TODO: Handle disconnected device (change status color) sama (write ke notif page kalo cukup waktu)
         print("device $id is missing");
       }
     }
-    // cooldown?? then start scanning again
   }
 
   @override
@@ -75,6 +95,7 @@ class DeviceListener extends ChangeNotifier {
     if (FlutterBluePlus.isScanningNow) {
       FlutterBluePlus.stopScan();
     }
+    _scanTimer?.cancel();
     _bleSub?.cancel();
     _pedometerSub?.cancel();
     super.dispose();
