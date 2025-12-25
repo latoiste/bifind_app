@@ -6,8 +6,7 @@ import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:pedometer_plus/pedometer_plus.dart';
 
 class DeviceListener extends ChangeNotifier {
-  final List<DeviceInfo> registeredDevice = [];
-  final List<String> registeredId = [];
+  final Map<String, DeviceInfo> registeredDevices = {};
   final Set<String> seenIdLastScan = {};
 
   StreamSubscription<StepStatus>? _pedometerSub;
@@ -20,10 +19,9 @@ class DeviceListener extends ChangeNotifier {
   }
 
   void registerDevice(DeviceInfo device) {
-    if (registeredId.contains(device.id.toString())) return;
+    if (registeredDevices.containsKey(device.id.toString())) return;
 
-    registeredDevice.add(device);
-    registeredId.add(device.id.toString());
+    registeredDevices[device.id.toString()] = device;
     notifyListeners();
   }
 
@@ -44,23 +42,22 @@ class DeviceListener extends ChangeNotifier {
       for (ScanResult r in results) {
         // ga ush filter id, udh di filter dalam startScan
         String id = r.device.remoteId.toString();
-        int index = registeredId.indexOf(id);
-        DeviceInfo device = registeredDevice[index];
-        
+        DeviceInfo? device = registeredDevices[id]; // device pasti ga null
+
         seenIdLastScan.add(id); //tandain device ga disconnect
 
-        device.addRssi(r.rssi);
+        device?.addRssi(r.rssi);
 
         // TODO: notify kalo distance > 10, write command ke device
       }
     });
   }
 
-  void _startScanning() async {
+  void _startScanning() {
     _performScan();
 
     _scanTimer = Timer.periodic(
-      Duration(seconds: 20),
+      Duration(seconds: 30),
       (_scanTimer) => _performScan(),
     );
   }
@@ -73,6 +70,7 @@ class DeviceListener extends ChangeNotifier {
 
   void _performScan() async {
     final Guid serviceUuid = Guid("d9380fdc-3c8f-4c49-874d-031ef136716c");
+    final List<String> registeredId = List.from(registeredDevices.keys); // keysnya itu remoteid
     seenIdLastScan.clear();
 
     await FlutterBluePlus.startScan(

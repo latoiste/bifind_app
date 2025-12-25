@@ -18,7 +18,8 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
-    final List<DeviceInfo> registeredDevices = context.watch<DeviceListener>().registeredDevice;
+    final listener = context.watch<DeviceListener>();
+    final List<DeviceInfo> registeredDevices = List.from(listener.registeredDevices.values);
 
     return ListView.builder(
       itemCount: registeredDevices.length + 1,
