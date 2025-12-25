@@ -6,17 +6,12 @@ import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 enum DeviceStatus { connected, disconnected }
 
 class DeviceInfo extends ChangeNotifier {
-  DeviceInfo({
-    required this.id,
-    required this.name,
-    required this.rssi,
-    required this.status,
-  });
+  DeviceInfo({required this.id, required this.name, required this.rssi});
 
   final DeviceIdentifier id;
   final String name;
   final List<int> rssi;
-  final DeviceStatus? status;
+  DeviceStatus? status;
   double? distance;
 
   void addRssi(int value) {
@@ -42,5 +37,10 @@ class DeviceInfo extends ChangeNotifier {
     distance = pow(10, (refPower - getAverageRssi()) / (10 * envFactor)) as double?;
 
     notifyListeners(); //bakal ngerebuild DeviceDetailsRow
+  }
+
+  void changeStatus(DeviceStatus status) {
+    this.status = status;
+    notifyListeners();
   }
 }

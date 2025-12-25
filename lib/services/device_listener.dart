@@ -45,6 +45,9 @@ class DeviceListener extends ChangeNotifier {
         DeviceInfo? device = registeredDevices[id]; // device pasti ga null
 
         seenIdLastScan.add(id); //tandain device ga disconnect
+        if ((device?.status ?? DeviceStatus.disconnected) != DeviceStatus.connected) {
+          device?.changeStatus(DeviceStatus.connected);
+        }
 
         device?.addRssi(r.rssi);
 
@@ -56,6 +59,7 @@ class DeviceListener extends ChangeNotifier {
   void _startScanning() {
     _performScan();
 
+    // cooldown 30 detik, terus mulai scan 5 detik, diulang sampe stop scanning
     _scanTimer = Timer.periodic(
       Duration(seconds: 30),
       (_scanTimer) => _performScan(),
@@ -70,7 +74,9 @@ class DeviceListener extends ChangeNotifier {
 
   void _performScan() async {
     final Guid serviceUuid = Guid("d9380fdc-3c8f-4c49-874d-031ef136716c");
-    final List<String> registeredId = List.from(registeredDevices.keys); // keysnya itu remoteid
+    final List<String> registeredId = List.from(
+      registeredDevices.keys,
+    ); // keysnya itu remoteid
     seenIdLastScan.clear();
 
     await FlutterBluePlus.startScan(
@@ -82,8 +88,9 @@ class DeviceListener extends ChangeNotifier {
     for (String id in registeredId) {
       // kalo id ga ke scan dalam 5 detik itu, anggap missing
       if (!seenIdLastScan.contains(id)) {
-        // TODO: Handle disconnected device (change status color) sama (write ke notif page kalo cukup waktu)
-        print("device $id is missing");
+        // TODO: write ke notif page kalo cukup waktu
+        DeviceInfo? device = registeredDevices[id];
+        device?.changeStatus(DeviceStatus.disconnected);
       }
     }
   }

@@ -19,31 +19,26 @@ class _ScanDialogState extends State<ScanDialog> {
       id: DeviceIdentifier("00:11:22:33:44:55"),
       name: "Smart Heart Rate Monitor",
       rssi: [5],
-      status: DeviceStatus.disconnected,
     ),
     DeviceInfo(
       id: DeviceIdentifier("AA:BB:CC:DD:EE:FF"),
       name: "Sony WH-1000XM4",
       rssi: [5],
-      status: DeviceStatus.connected,
     ),
     DeviceInfo(
       id: DeviceIdentifier("12:34:56:78:90:AB"),
       name: "Bi-Find 1",
       rssi: [5],
-      status: DeviceStatus.connected,
     ),
     DeviceInfo(
       id: DeviceIdentifier("FE:ED:BE:EF:01:02"),
       name: "ESP32_Sensor_Node",
       rssi: [5],
-      status: DeviceStatus.connected,
     ),
     DeviceInfo(
       id: DeviceIdentifier("66:55:44:33:22:11"),
       name: "Kitchen Thermometer",
       rssi: [5],
-      status: DeviceStatus.connected,
     ),
   ];
   final List<DeviceInfo> _scanResults = [];
@@ -77,8 +72,7 @@ class _ScanDialogState extends State<ScanDialog> {
           DeviceInfo newDevice = DeviceInfo(
             id: id,
             name: name,
-            rssi: [],
-            status: null,
+            rssi: [r.rssi],
           );
           _scanResults.add(newDevice);
           _expansibleController.add(ExpansibleController());
@@ -105,8 +99,7 @@ class _ScanDialogState extends State<ScanDialog> {
         DeviceInfo(
           id: DeviceIdentifier("66:77:67:67:67:67"),
           name: "six",
-          rssi: [],
-          status: null,
+          rssi: [-45],
         ),
       );
       _expansibleController.add(ExpansibleController());
