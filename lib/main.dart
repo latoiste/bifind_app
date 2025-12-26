@@ -1,12 +1,19 @@
 import 'package:bifind_app/services/device_listener.dart';
+import 'package:bifind_app/services/notification_service.dart';
 import 'package:flutter/material.dart';
 import "package:bifind_app/pages/main_page.dart";
 import 'package:provider/provider.dart';
 
-void main() {
-  runApp(ChangeNotifierProvider(
-    create: (context) => DeviceListener(),
-    child: const MyApp(),));
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await NotificationService().init();
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => DeviceListener(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -14,8 +21,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: MainPage(),
-    );
+    return MaterialApp(home: MainPage());
   }
 }
