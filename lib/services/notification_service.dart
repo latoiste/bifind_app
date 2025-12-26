@@ -8,7 +8,7 @@ class NotificationService {
   factory NotificationService() {
     return _instance;
   }
-  final FlutterLocalNotificationsPlugin notificationsPlugin =
+  final FlutterLocalNotificationsPlugin _notificationsPlugin =
       FlutterLocalNotificationsPlugin();
 
   Future<void> init() async {
@@ -18,7 +18,20 @@ class NotificationService {
         DarwinInitializationSettings();
     const InitializationSettings initializationSettings =
         InitializationSettings(android: androidSettings, iOS: iosSettings);
-    
-    await notificationsPlugin.initialize(initializationSettings);
+
+    await _notificationsPlugin.initialize(initializationSettings);
+  }
+
+  Future<void> showOutOfRangeNotification(String name) async {
+    return _notificationsPlugin.show(
+      0,
+      "Item Left Behind!",
+      "$name is out of range",
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          "out_of_range_channel_id", 
+          "Out Of Range Alert")
+      ),
+    );
   }
 }
