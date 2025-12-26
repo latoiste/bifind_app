@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:bifind_app/constants/device_uuid.dart';
 import 'package:bifind_app/models/device_info.dart';
+import 'package:bifind_app/services/device_notifier.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:pedometer_plus/pedometer_plus.dart';
@@ -42,16 +44,20 @@ class DeviceListener extends ChangeNotifier {
       for (ScanResult r in results) {
         // ga ush filter id, udh di filter dalam startScan
         String id = r.device.remoteId.toString();
-        DeviceInfo? device = registeredDevices[id]; // device pasti ga null
+        DeviceInfo? deviceInfo = registeredDevices[id]; // deviceInfo pasti ga null
+        BluetoothDevice device = r.device;
 
-        seenIdLastScan.add(id); //tandain device ga disconnect
-        if ((device?.status ?? DeviceStatus.disconnected) != DeviceStatus.connected) {
-          device?.changeStatus(DeviceStatus.connected);
+        seenIdLastScan.add(id); //tandain deviceInfo ga disconnect
+        if ((deviceInfo?.status ?? DeviceStatus.disconnected) != DeviceStatus.connected) {
+          deviceInfo?.changeStatus(DeviceStatus.connected);
         }
 
-        device?.addRssi(r.rssi);
+        // ini ngeupdate distance
+        deviceInfo?.addRssi(r.rssi);
 
-        // TODO: notify kalo distance > 10, write command ke device
+        if ((deviceInfo?.distance ?? 0) > 10.0) {
+          notifyDevice(device, deviceInfo!);
+        }
       }
     });
   }
@@ -59,9 +65,9 @@ class DeviceListener extends ChangeNotifier {
   void _startScanning() {
     _performScan();
 
-    // cooldown 30 detik, terus mulai scan 5 detik, diulang sampe stop scanning
+    // cooldown 1 menit, terus mulai scan 5 detik, diulang sampe stop scanning
     _scanTimer = Timer.periodic(
-      Duration(seconds: 30),
+      Duration(minutes: 1),
       (_scanTimer) => _performScan(),
     );
   }
@@ -73,7 +79,6 @@ class DeviceListener extends ChangeNotifier {
   }
 
   void _performScan() async {
-    final Guid serviceUuid = Guid("d9380fdc-3c8f-4c49-874d-031ef136716c");
     final List<String> registeredId = List.from(
       registeredDevices.keys,
     ); // keysnya itu remoteid

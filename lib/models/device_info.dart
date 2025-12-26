@@ -13,6 +13,7 @@ class DeviceInfo extends ChangeNotifier {
   final List<int> rssi;
   DeviceStatus? status;
   double? distance;
+  bool writeCooldownActive = false;
 
   void addRssi(int value) {
     int windowSize = 10;
@@ -42,5 +43,13 @@ class DeviceInfo extends ChangeNotifier {
   void changeStatus(DeviceStatus status) {
     this.status = status;
     notifyListeners();
+  }
+
+  Future<void> activateWriteCooldown() async {
+    if (writeCooldownActive) return;
+
+    writeCooldownActive = true;
+    await Future.delayed(Duration(minutes: 2));
+    writeCooldownActive = false;
   }
 }

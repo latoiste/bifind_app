@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bifind_app/components/scanned_device_row.dart';
+import 'package:bifind_app/constants/device_uuid.dart';
 import 'package:bifind_app/models/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
@@ -51,8 +52,6 @@ class _ScanDialogState extends State<ScanDialog> {
   StreamSubscription? _subscription;
 
   void startBleScan() async {
-    final Guid serviceUuid = Guid("d9380fdc-3c8f-4c49-874d-031ef136716c");
-
     _subscription = FlutterBluePlus.scanResults.listen((results) {
       setState(() {
         final Iterable<DeviceIdentifier> discoveredId = _scanResults.map(
