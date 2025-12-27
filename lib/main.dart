@@ -21,6 +21,22 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: MainPage());
+    return MaterialApp(
+      home: MainPage(),
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Color(0xFF67C090)
+        ),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF67C090),
+          foregroundColor: Color(0xFF3D7155),
+        ),
+        textTheme: const TextTheme(
+            bodyMedium: TextStyle(
+              fontSize: 16.0,
+              fontWeight: FontWeight.bold,
+            )
+        ),
+      ));
   }
 }
