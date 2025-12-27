@@ -1,3 +1,4 @@
+import 'package:bifind_app/components/appbar/custom_appbar.dart';
 import 'package:flutter/material.dart';
 import 'package:bifind_app/pages/home.dart';
 import 'package:bifind_app/pages/notifications.dart';
@@ -29,11 +30,10 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+    final double screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.blue,
-        title: const Text("AAAAAAAAAA"),
-      ),
+      appBar: CustomAppbar(currentIndex: _currentIndex, height: screenHeight * 0.12),
       body: _pages[_currentIndex],
       bottomNavigationBar: Navbar(
         selectedIndex: _currentIndex,

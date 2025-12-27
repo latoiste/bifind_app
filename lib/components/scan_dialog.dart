@@ -161,9 +161,6 @@ class _ScanDialogState extends State<ScanDialog> {
               ),
             ),
             TextButton(
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.blue.shade600,
-              ),
               onPressed: () => Navigator.pop(context),
               child: Text("Close"),
             ),
