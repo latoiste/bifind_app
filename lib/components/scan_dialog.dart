@@ -15,40 +15,9 @@ class ScanDialog extends StatefulWidget {
 
 class _ScanDialogState extends State<ScanDialog> {
   final ScrollController _scrollController = ScrollController();
-  final List<DeviceInfo> fakeResult = [
-    DeviceInfo(
-      id: DeviceIdentifier("00:11:22:33:44:55"),
-      name: "Smart Heart Rate Monitor",
-      rssi: [5],
-    ),
-    DeviceInfo(
-      id: DeviceIdentifier("AA:BB:CC:DD:EE:FF"),
-      name: "Sony WH-1000XM4",
-      rssi: [5],
-    ),
-    DeviceInfo(
-      id: DeviceIdentifier("12:34:56:78:90:AB"),
-      name: "Bi-Find 1",
-      rssi: [5],
-    ),
-    DeviceInfo(
-      id: DeviceIdentifier("FE:ED:BE:EF:01:02"),
-      name: "ESP32_Sensor_Node",
-      rssi: [5],
-    ),
-    DeviceInfo(
-      id: DeviceIdentifier("66:55:44:33:22:11"),
-      name: "Kitchen Thermometer",
-      rssi: [5],
-    ),
-  ];
   final List<DeviceInfo> _scanResults = [];
+  final List<ExpansibleController> _expansibleController = [];
   int _deviceCount = 1;
-  // TODO: change to empty list later
-  final List<ExpansibleController> _expansibleController = List.generate(
-    5,
-    (index) => ExpansibleController(),
-  );
   StreamSubscription? _subscription;
 
   void startBleScan() async {
@@ -68,11 +37,7 @@ class _ScanDialogState extends State<ScanDialog> {
             _deviceCount++;
           }
 
-          DeviceInfo newDevice = DeviceInfo(
-            id: id,
-            name: name,
-            rssi: [r.rssi],
-          );
+          DeviceInfo newDevice = DeviceInfo(id: id, name: name, rssi: [r.rssi]);
           _scanResults.add(newDevice);
           _expansibleController.add(ExpansibleController());
         }
@@ -86,28 +51,11 @@ class _ScanDialogState extends State<ScanDialog> {
 
     FlutterBluePlus.stopScan();
     _subscription?.cancel();
-    print("scanning finished??");
-  }
-
-  // TODO: Delete later
-  Future<void> addDeviceDummy() async {
-    await Future.delayed(const Duration(seconds: 5));
-    if (!mounted) return;
-    setState(() {
-      fakeResult.add(
-        DeviceInfo(
-          id: DeviceIdentifier("66:77:67:67:67:67"),
-          name: "six",
-          rssi: [-45],
-        ),
-      );
-      _expansibleController.add(ExpansibleController());
-    });
   }
 
   @override
   void initState() {
-    addDeviceDummy();
+    startBleScan();
     super.initState();
   }
 
@@ -126,7 +74,6 @@ class _ScanDialogState extends State<ScanDialog> {
     super.dispose();
   }
 
-  // TODO: ganti semua fakeResult ke _scanResult
   @override
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
@@ -146,13 +93,12 @@ class _ScanDialogState extends State<ScanDialog> {
               child: Scrollbar(
                 controller: _scrollController,
                 thumbVisibility: true,
-                // TODO: add condition if no devices being scanned
                 child: ListView.builder(
-                  itemCount: fakeResult.length,
+                  itemCount: _scanResults.length,
                   controller: _scrollController,
                   itemBuilder: (context, index) {
                     return ScannedDeviceRow(
-                      device: fakeResult[index],
+                      device: _scanResults[index],
                       index: index,
                       controllerList: _expansibleController,
                     );

@@ -26,7 +26,6 @@ class DeviceDetailsRow extends StatelessWidget {
       value: device,
       child: Consumer<DeviceInfo>(
         builder: (context, deviceInfo, child) {
-          print("${deviceInfo.name} is rebuilt");
           return Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             mainAxisSize: MainAxisSize.min,

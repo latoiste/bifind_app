@@ -28,7 +28,6 @@ class DeviceListener extends ChangeNotifier {
   }
 
   void _startMovementListener() {
-    print("Pedometer listening");
     // pedometer cuma bisa di native mobile, ini biar ga ngecrash waktu debug aja
     if (kIsWeb) return;
 
@@ -39,7 +38,6 @@ class DeviceListener extends ChangeNotifier {
   }
 
   void _startBleListener() {
-    print("FlutterBluePlus listening");
     _bleSub = FlutterBluePlus.scanResults.listen((results) {
       for (ScanResult r in results) {
         // ga ush filter id, udh di filter dalam startScan
