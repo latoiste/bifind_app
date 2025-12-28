@@ -5,13 +5,13 @@ import 'package:bifind_app/models/device_info.dart';
 import 'package:bifind_app/services/device_notifier.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
-import 'package:pedometer_plus/pedometer_plus.dart';
+import 'package:pedometer/pedometer.dart';
 
 class DeviceListener extends ChangeNotifier {
   final Map<String, DeviceInfo> registeredDevices = {};
   final Set<String> seenIdLastScan = {};
 
-  StreamSubscription<StepStatus>? _pedometerSub;
+  StreamSubscription<PedestrianStatus>? _pedometerSub;
   StreamSubscription<List<ScanResult>>? _bleSub;
   Timer? _scanTimer;
 
@@ -31,9 +31,9 @@ class DeviceListener extends ChangeNotifier {
     // pedometer cuma bisa di native mobile, ini biar ga ngecrash waktu debug aja
     if (kIsWeb) return;
 
-    _pedometerSub = Pedometer().stepStatusStream().listen(
-      (status) =>
-          status == StepStatus.walking ? _startScanning() : _stopScanning(),
+    _pedometerSub = Pedometer.pedestrianStatusStream.listen(
+      (pedestrianStatus) =>
+          pedestrianStatus.status == 'walking' ? _startScanning() : _stopScanning(),
     );
   }
 
